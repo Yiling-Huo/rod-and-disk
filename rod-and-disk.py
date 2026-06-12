@@ -262,7 +262,7 @@ def main():
     # Set working directory
     ##########
     # Set working directory to the location of this .py file
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    # os.chdir(os.path.dirname(os.path.abspath(__file__)))
     # create results folder if nonexistent
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
