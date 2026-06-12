@@ -32,7 +32,7 @@ results_dir = 'results/'
 # tkinter functions
 ##########
 
-def ask_params(defaults={"participant_id": "001", "trials": 20, "speed_deg_s": 30.0, "duration": 60, "direction":"clockwise", "seed":1, "disk_count": 440, "rod_len_px": 200, "central_radius_px": 110, "disk_diam_px": 50, "between_disk_gap": 20}):
+def ask_params(defaults={"participant_id": "001", "trials": 20, "speed_deg_s": 12.0, "duration": 60, "direction":"clockwise", "seed":1, "disk_count": 440, "rod_len_px": 200, "central_radius_px": 110, "disk_diam_px": 50, "between_disk_gap": 20}):
     root = tk.Tk()
     root.withdraw()  # hide the empty root window
 
@@ -262,7 +262,7 @@ def main():
     # Set working directory
     ##########
     # Set working directory to the location of this .py file
-    # os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     # create results folder if nonexistent
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
@@ -276,6 +276,7 @@ def main():
     log_file = subject + f"_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
     if condition == "static":
         direction = 0
+        direction_str = "N/A"
     else:
         if direction_str == "clockwise":
             direction = 1
@@ -394,7 +395,7 @@ def main():
             if current_time - started_time >= duration_ms:
                 trial += 1
                 now = datetime.now()
-                data.append([now.strftime("%Y-%m-%d"),now.strftime("%H-%M-%S"),started_time,current_time,subject,condition,duration_ms,rod_start_angle,rod_angle,direction_str,disk_rotation_speed])
+                data.append([now.strftime("%Y-%m-%d"),now.strftime("%H-%M-%S"),started_time,current_time,subject,condition,trial,duration_ms,rod_start_angle,rod_angle,direction_str,disk_rotation_speed])
                 in_trial = False
                 if trial >= trial_total:
                     ended = True
