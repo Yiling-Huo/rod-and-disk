@@ -3,21 +3,17 @@
 from cx_Freeze import setup, Executable
 
 build_options = {
-# Only real packages here
-"packages": ["pygame", "tkinter"],          # add "tkinter" only if you actually import it
-# Single-file modules go here
+"packages": ["pygame", "tkinter"],
 "includes": ["os", "sys", "csv", "random", "math", "datetime"],
 "include_files": [("assets", "assets")],
-"excludes": ["numpy", "pip", "cx_Freeze"],
-# Uncomment if you still hit RecursionError:
-# "zip_include_packages": []
+"excludes": ["numpy", "pip", "cx_Freeze"]
 }
 
 executables = [
 Executable(
-"rod-and-disk.py",            # rename your script file accordingly
+"rod-and-disk.py",
 icon="icon.ico",
-base="Win32GUI",              # for a GUI app on Windows; remove if you want a console
+base=None,
 target_name="rod-and-disk-demo-yiling.exe"
 )
 ]

@@ -241,7 +241,7 @@ def draw_disks(screen_width, screen_height, seed, disk_count, central_radius_px,
             placed += 1
             positions.append((x,y))
     
-    return disk_surface
+    return disk_surface.convert_alpha()
 
 def draw_rod(screen_width, screen_height, center, central_radius_px, rod_len_px):
     # draw a central circle 
@@ -252,7 +252,7 @@ def draw_rod(screen_width, screen_height, center, central_radius_px, rod_len_px)
     p2 = (center[0], center[1] + (rod_len_px/2))
     pygame.draw.line(rod_surface, white, p1, p2, 5)
 
-    return rod_surface
+    return rod_surface.convert_alpha()
 
 ##########
 # Main function
@@ -386,9 +386,9 @@ def main():
             now = pygame.time.get_ticks()
             elapsed = (now - started_time) * 0.001
             disk_angle = (direction * disk_rotation_speed * elapsed) % 360
-            disk_rotated = pygame.transform.rotozoom(disk_surface, -disk_angle, 1.0)
+            disk_rotated = pygame.transform.rotate(disk_surface, -disk_angle) # use rotate instead of rotozoom to reduce CPU usage and prevent lagging (but will cause slightly more aliasing/jagged edges)
             rod_rotated = pygame.transform.rotozoom(rod_surface, -rod_angle, 1.0)
-            wipe(screen, screen_width, screen_height)
+            # wipe(screen, screen_width, screen_height)
             screen.blit(disk_rotated, disk_rotated.get_rect(center=center))
             screen.blit(rod_rotated, rod_rotated.get_rect(center=center))
             current_time = pygame.time.get_ticks()
@@ -404,7 +404,7 @@ def main():
             message = text_font.render("press space for the next trial.", True, white)
             screen.blit(message, message.get_rect(center = (screen_width*0.5, (i+1)*(screen_height*(1/(len(instructions)+1))))))
         pygame.display.flip()
-        clock.tick(30) # cap at 30 fps to try to deal with slow computer
+        clock.tick(120) # cap at 120 fps to allow smoother animation on better PCs
 
     # quit game
     pygame.quit()
