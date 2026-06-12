@@ -324,7 +324,6 @@ def main():
 
     # main loop
     while running:
-        dt = clock.tick(60)/1000.0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -383,7 +382,9 @@ def main():
                 message = text_font.render(debriefs[i], True, white)
                 screen.blit(message, message.get_rect(center = (screen_width*0.5, (i+1)*(screen_height*(1/(len(instructions)+1))))))
         elif in_trial:
-            disk_angle += direction * disk_rotation_speed * dt
+            now = pygame.time.get_ticks()
+            elapsed = (now - started_time) * 0.001
+            disk_angle = (direction * disk_rotation_speed * elapsed) % 360
             disk_rotated = pygame.transform.rotozoom(disk_surface, -disk_angle, 1.0)
             rod_rotated = pygame.transform.rotozoom(rod_surface, -rod_angle, 1.0)
             wipe(screen, screen_width, screen_height)
@@ -402,7 +403,7 @@ def main():
             message = text_font.render("press space for the next trial.", True, white)
             screen.blit(message, message.get_rect(center = (screen_width*0.5, (i+1)*(screen_height*(1/(len(instructions)+1))))))
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(30) # cap at 30 fps to try to deal with slow computer
 
     # quit game
     pygame.quit()
