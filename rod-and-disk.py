@@ -407,7 +407,7 @@ def main():
                             current_time = pygame.time.get_ticks()
                             duration_ms = current_time - trial_start_time
                             trial += 1
-                            data.append([now.strftime("%Y-%m-%d"),now.strftime("%H-%M-%S"),started_time,current_time,seed,subject,condition,trial,duration_ms,rod_start_angle,rod_angle,direction_str,disk_rotation_speed_dat])
+                            data.append([now.strftime("%Y-%m-%d"),now.strftime("%H-%M-%S"),trial_start_time,current_time,seed,subject,condition,trial,duration_ms,rod_start_angle,rod_angle,direction_str,disk_rotation_speed_dat])
                             if trial >= trial_total:
                                 ended = True
                             else:
