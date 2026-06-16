@@ -8,7 +8,7 @@ This is a pygame application to run the classic rod-and-disk task. In each trial
 
 ### Windows 11
 
-- <a href="https://yiling-huo.github.io/files/programs/rod-and-disk.zip" download>Download (Windows 11, 64-bit)</a>.
+- <a href="https://yiling-huo.github.io/files/programs/rod-and-disk-python.zip" download>Download (Windows 11, 64-bit)</a>.
 - Running on Windows 11:
     - After downloading, extract the ZIP and run `rod-and-disk-python.exe`.
     - If Windows SmartScreen shows a “Windows protected your PC” warning:
