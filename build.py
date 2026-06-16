@@ -14,7 +14,7 @@ Executable(
 "rod-and-disk.py",
 icon="icon.ico",
 base=None,
-target_name="rod-and-disk-demo-yiling.exe"
+target_name="rod-and-disk-python.exe"
 )
 ]
 
