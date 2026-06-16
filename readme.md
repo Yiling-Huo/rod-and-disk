@@ -8,7 +8,7 @@ This is a pygame application to run the classic rod-and-disk task. In each trial
 
 ### Windows 11
 
-- <a href="https://yiling-huo.github.io/files/programs/rod-and-disk-python.zip" download>Download (Windows 11, 64-bit)</a>.
+- <a href="https://github.com/Yiling-Huo/rod-and-disk/releases/latest/download/RodAndDisk-Win11-x64.zip" download>Download (Windows 11, 64-bit)</a>.
 - Running on Windows 11:
     - After downloading, extract the ZIP and run `rod-and-disk-python.exe`.
     - If Windows SmartScreen shows a “Windows protected your PC” warning:
@@ -90,4 +90,4 @@ Keep seed, appearance parameters, and display geometry constant across sessions 
 
 ## Performance notes
 
-- The program pre-builds 720 rotated frames (0.5° steps) for smooth disk animation in motion condition (equivalent to 60 fps); launch after setup may take a moment (~1 min).
+- The program pre-builds 720 rotated frames (0.5° steps) for smooth disk animation in motion condition; launch after setup may take a moment (~1 min).

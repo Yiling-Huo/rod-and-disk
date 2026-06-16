@@ -5,7 +5,7 @@ from cx_Freeze import setup, Executable
 build_options = {
 "packages": ["pygame", "tkinter"],
 "includes": ["os", "sys", "csv", "random", "math", "datetime"],
-"include_files": [("assets", "assets")],
+# "include_files": [("assets", "assets")],
 "excludes": ["numpy", "pip", "cx_Freeze"]
 }
 
