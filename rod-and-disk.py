@@ -321,9 +321,6 @@ def main():
     screen_width, screen_height = screen.get_size()
     center = (screen_width // 2, screen_height // 2)
     clock = pygame.time.Clock()
-    icon = pygame.image.load('assets/icon.png')
-    pygame.display.set_icon(icon)
-    pygame.display.set_caption('Rod and Disk')
     pygame.mouse.set_visible(False)
     screen.fill(black)
 

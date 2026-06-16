@@ -3,6 +3,8 @@ gpt.py
 results/*
 rod-and-disk-opt.py
 notes.txt
+assets/
+icon.ico
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -20,11 +20,8 @@ This is a pygame application to run the classic rod-and-disk task. In each trial
 
 - Python: 3.10 - 3.13 recommended.
 - Dependencies:
-    - pygame >= 2.6.0
-        - Install via pip: `pip install pygame`
+    - pygame >= 2.6.0 (Install via pip: `pip install pygame`)
     - tkinter (ships with most Python distributions; on Linux, install system package e.g., `apt-get install python3-tk`)
-- Assets:
-    - Place assets/icon.png relative to the script (used for window icon).
 - Running
     - From a terminal: `python rod_and_disk.py`
     - The program opens in exclusive fullscreen on the primary display. The mouse cursor is hidden during the task.
@@ -85,8 +82,10 @@ This is a pygame application to run the classic rod-and-disk task. In each trial
 ## Reproducibility notes
 
 The “Randomisation seed” deterministically sets:
+
 - The dot field layout.
 - The sign (+/−) of the initial rod angle on each trial.
+
 Keep seed, appearance parameters, and display geometry constant across sessions for strict reproducibility.
 
 ## Performance notes
