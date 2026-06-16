@@ -362,8 +362,8 @@ def main():
     disk_surface = draw_disks(screen_width, screen_height, rand_seed, disk_count, central_radius_px, disk_diam_px, between_disk_gap)
     rotated = get_rotations(disk_surface, condition)
     rod_surface = draw_rod(screen_width, screen_height, center, central_radius_px, rod_len_px)
-    rod_start_angle = rod_start_angles[trial] * 40
-    rod_angle = rod_start_angles[trial] * 40
+    rod_start_angle = rod_start_angles[trial] * rod_init_angle
+    rod_angle = rod_start_angles[trial] * rod_init_angle
     # wipe text
     wipe(screen, screen_width, screen_height)
 
@@ -443,7 +443,7 @@ def main():
             screen.blit(rotated[disk_angle], rotated[disk_angle].get_rect(center=center))
             screen.blit(rod_rotated, rod_rotated.get_rect(center=center))
         pygame.display.flip()
-        clock.tick(120) # cap at 120 fps to allow smoother animation on better PCs
+        clock.tick(60) # cap at 60 fps
 
     # quit game
     pygame.quit()
