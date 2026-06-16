@@ -14,6 +14,7 @@ instructions = [
     "Rod-and-Disk Task",
     "Goal: Align the central rod to your perceived vertical.",
     "Controls: Mouse wheel to rotate.",
+    "When satisfied, press SPACE to advance.",
     "Press ENTER to start.",
     "Double-press ESC to quit."
 ]
@@ -32,7 +33,7 @@ results_dir = 'results/'
 # tkinter functions
 ##########
 
-def ask_params(defaults={"participant_id": "001", "trials": 20, "speed_deg_s": 12.0, "duration": 60, "direction":"clockwise", "seed":1, "disk_count": 440, "rod_len_px": 200, "central_radius_px": 110, "disk_diam_px": 50, "between_disk_gap": 20}):
+def ask_params(defaults={"participant_id": "001", "trials": 20, "speed_deg_s": 30.0, "duration": 60, "direction":"clockwise", "seed":1, "disk_count": 440, "rod_len_px": 200, "central_radius_px": 110, "disk_diam_px": 50, "between_disk_gap": 20, "rod_init_angle": 40, "rod_velocity": 0.5}):
     root = tk.Tk()
     root.withdraw()  # hide the empty root window
 
@@ -49,7 +50,8 @@ def ask_params(defaults={"participant_id": "001", "trials": 20, "speed_deg_s": 1
     trials_var = tk.StringVar(value=str(defaults["trials"]))
     speed_var = tk.StringVar(value=str(defaults["speed_deg_s"]))
     seed_var = tk.StringVar(value=str(defaults["seed"]))
-    duration_var = tk.StringVar(value=str(defaults["duration"]))
+    rod_init_angle_var = tk.StringVar(value=str(defaults["rod_init_angle"]))
+    rod_vel_var = tk.StringVar(value=str(defaults["rod_velocity"]))
     conditions = ["motion", "static"]
     condition_var = tk.StringVar(value=conditions[0])
     directions = ["clockwise", "counterclockwise"]
@@ -76,21 +78,25 @@ def ask_params(defaults={"participant_id": "001", "trials": 20, "speed_deg_s": 1
     trials_entry = ttk.Entry(frm, textvariable=trials_var, width=10)
     trials_entry.grid(row=2, column=1, sticky="w", pady=6)
 
-    ttk.Label(frm, text="Trial duration:").grid(row=3, column=0, sticky="e", padx=(0,8), pady=6)
-    duration_entry = ttk.Entry(frm, textvariable=duration_var, width=10)
-    duration_entry.grid(row=3, column=1, sticky="w", pady=6)
+    ttk.Label(frm, text="Rod beginning angle (+/-):").grid(row=3, column=0, sticky="e", padx=(0,8), pady=6)
+    rod_init_angle_entry = ttk.Entry(frm, textvariable=rod_init_angle_var, width=10)
+    rod_init_angle_entry.grid(row=3, column=1, sticky="w", pady=6)
 
-    ttk.Label(frm, text="Direction:").grid(row=4, column=0, sticky="e", padx=(0,8), pady=6)
+    ttk.Label(frm, text="Rod velocity (deg/input):").grid(row=4, column=0, sticky="e", padx=(0,8), pady=6)
+    rod_vel_entry = ttk.Entry(frm, textvariable=rod_vel_var, width=10)
+    rod_vel_entry.grid(row=4, column=1, sticky="w", pady=6)
+
+    ttk.Label(frm, text="Disk rotation direction:").grid(row=5, column=0, sticky="e", padx=(0,8), pady=6)
     dir_cb = ttk.Combobox(frm, values=directions, textvariable=direction_var, state="readonly", width=18)
-    dir_cb.grid(row=4, column=1, padx=8, pady=8, sticky="w")
+    dir_cb.grid(row=5, column=1, padx=8, pady=8, sticky="w")
 
-    ttk.Label(frm, text="Disk rotation speed (degree/s):").grid(row=5, column=0, sticky="e", padx=(0,8), pady=6)
+    ttk.Label(frm, text="Disk rotation speed (deg/s):").grid(row=6, column=0, sticky="e", padx=(0,8), pady=6)
     speed_entry = ttk.Entry(frm, textvariable=speed_var, width=10)
-    speed_entry.grid(row=5, column=1, sticky="w", pady=6)
+    speed_entry.grid(row=6, column=1, sticky="w", pady=6)
 
-    ttk.Label(frm, text="Radomisation seed:").grid(row=6, column=0, sticky="e", padx=(0,8), pady=6)
+    ttk.Label(frm, text="Radomisation seed:").grid(row=7, column=0, sticky="e", padx=(0,8), pady=6)
     seed_entry = ttk.Entry(frm, textvariable=seed_var, width=10)
-    seed_entry.grid(row=6, column=1, sticky="w", pady=6)
+    seed_entry.grid(row=7, column=1, sticky="w", pady=6)
 
     ## Second set: appearances
     ttk.Label(frm, text="Disk count:").grid(row=0, column=3, sticky="e", padx=(0,8), pady=6)
@@ -129,11 +135,14 @@ def ask_params(defaults={"participant_id": "001", "trials": 20, "speed_deg_s": 1
             if speed < 0:
                 raise ValueError("Speed must be >= 0.")
             seed = int(seed_var.get())
-            if seed < 1 or seed > 10000:
-                raise ValueError("Seed must be an integer between 1 and 10000.")
-            duration = int(duration_var.get())
-            if duration <= 0:
-                raise ValueError("Duration must be >= 0.")
+            if len(str(abs(seed))) > 20:
+                raise ValueError("Seed must be an integer of 20 digits max.")
+            rod_init_angle = int(rod_init_angle_var.get())
+            if rod_init_angle < 0:
+                raise ValueError("Rod initial angle must be >= 0.")
+            rod_vel = float(rod_vel_var.get())
+            if rod_vel <= 0 or rod_vel > 360:
+                raise ValueError("Rod velocity must be between 0 and 360.")
             condition = str(condition_var.get())
             direction = str(direction_var.get())
 
@@ -146,7 +155,7 @@ def ask_params(defaults={"participant_id": "001", "trials": 20, "speed_deg_s": 1
         except ValueError as e:
             messagebox.showerror("Invalid input", str(e), parent=dlg)
             return
-        result = {"participant_id": pid, "trials": trials, "speed_deg_s": speed, "condition": condition, "duration": duration, "direction":direction, "seed": seed, "disk_count": disk_count, "rod_len_px": rod_len_px, "central_radius_px": central_radius_px, "disk_diam_px": disk_diam_px, "between_disk_gap": between_disk_gap}
+        result = {"participant_id": pid, "trials": trials, "speed_deg_s": speed, "condition": condition, "rod_init_angle": rod_init_angle, "rod_velocity":rod_vel, "direction":direction, "seed": seed, "disk_count": disk_count, "rod_len_px": rod_len_px, "central_radius_px": central_radius_px, "disk_diam_px": disk_diam_px, "between_disk_gap": between_disk_gap}
         dlg.destroy()
 
     # To do when user presses cancel button
@@ -206,7 +215,7 @@ def wipe(screen, screen_width, screen_height):
     # pygame.display.flip()
 
 # build disks image
-def draw_disks(screen_width, screen_height, seed, disk_count, central_radius_px, disk_diam_px, between_disk_gap):
+def draw_disks(screen_width, screen_height, rand_seed, disk_count, central_radius_px, disk_diam_px, between_disk_gap):
     # define a surface that will cover the entire screen no matter rotation angle. width & height = screen diagnal
     coverable_surface_width = int(math.sqrt(screen_width**2+screen_height**2))
 
@@ -214,7 +223,6 @@ def draw_disks(screen_width, screen_height, seed, disk_count, central_radius_px,
     disk_surface.fill(black)
     disk_surface_center = (coverable_surface_width//2, coverable_surface_width//2)
 
-    seed = random.Random(seed)
     placed = 0
     positions = []
     max_iters = disk_count * 200
@@ -223,8 +231,8 @@ def draw_disks(screen_width, screen_height, seed, disk_count, central_radius_px,
     min_center_distance_between_disks = (disk_diam_px + between_disk_gap)**2
     while placed < disk_count and iters < max_iters:
         iters += 1
-        x = seed.randint(0, coverable_surface_width - 1)
-        y = seed.randint(0, coverable_surface_width - 1)
+        x = rand_seed.randint(0, coverable_surface_width - (disk_diam_px/2))
+        y = rand_seed.randint(0, coverable_surface_width - (disk_diam_px/2))
         dx = x - disk_surface_center[0]
         dy = y - disk_surface_center[1]
         if math.hypot(dx, dy) >= central_radius_px + disk_diam_px*0.5:
@@ -243,6 +251,19 @@ def draw_disks(screen_width, screen_height, seed, disk_count, central_radius_px,
     
     return disk_surface.convert_alpha()
 
+# get a set of rotated images
+##### use 0.5 degree steps to make sure smooth animation, but increases build time
+def get_rotations(surface, condition="motion"):
+    rotations = None
+    if condition == "motion":
+        rotations = {angle: pygame.transform.rotozoom(surface, -angle*0.5, 1.0) for angle in range(720)}
+        # rotations = {angle: pygame.transform.rotozoom(surface, -angle, 1.0) for angle in range(360)}
+    else:
+        rotations = {angle: surface for angle in range(720)} # no need to compute rotated versions if static condition
+        # rotations = {angle: surface for angle in range(360)} # no need to compute rotated versions if static condition
+    return rotations
+
+# build rod image
 def draw_rod(screen_width, screen_height, center, central_radius_px, rod_len_px):
     # draw a central circle 
     rod_surface = pygame.Surface((screen_width, screen_height),pygame.SRCALPHA)
@@ -272,18 +293,23 @@ def main():
     ##########
     params = ask_params()
     print("Parameters:", params)
-    subject, trial_total, disk_rotation_speed, condition, duration, direction_str, seed, disk_count, rod_len_px, central_radius_px, disk_diam_px, between_disk_gap = params.values()
+    subject, trial_total, disk_rotation_speed, condition, rod_init_angle, rod_velocity, direction_str, seed, disk_count, rod_len_px, central_radius_px, disk_diam_px, between_disk_gap = params.values()
     log_file = subject + f"_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    disk_rotation_speed_dat = disk_rotation_speed
     if condition == "static":
         direction = 0
         direction_str = "N/A"
+        disk_rotation_speed_dat = "N/A"
     else:
         if direction_str == "clockwise":
             direction = 1
         else:
             direction = -1
-    rod_start_angles = [random.choice([1, -1]) for _ in range(trial_total)]
-    wheel_step_degree = 0.5 #### Not sure what speed John needs, for now randomly using 0.5 degree per input
+    # set randomisation seed for both rod init position and disk generation
+    rand_seed = random.Random(seed)
+    rod_start_angles = [rand_seed.choice([1, -1]) for _ in range(trial_total)]
+    wheel_step_degree = rod_velocity
+    
 
     ##########
     # Initialise pygame
@@ -311,21 +337,42 @@ def main():
     last_esc_time = 0
     double_esc_time = 500  # milliseconds
     # task variables
-    data = [['date', 'time', 'start_time', 'end_time', 'participant', 'condition', 'trial', 'duration_ms', 'rod_start_angle', 'rod_end_angle', 'disk_rotation_direction', 'disk_speed']]
+    data = [['Date', 'Time', 'Trial Start Time (ms)', 'Trial End Time (ms)', 'Randomisation seed', 'Participant', 'Condition', 'Trial', 'Trial Duration (ms)', 'Rod Start Position (deg)', 'Rod Set Position (deg)', 'Roll Direction', 'Roll Velocity (deg/s)']]
     trial = 0
+    duration_ms = 0
     disk_angle = 0.0
     rod_angle = 0
     disk_surface = None
+    rotated = None
     rod_surface = None
-    started_time = 0
-    duration_ms = duration * 1000
     started = False
     in_trial = False
     ended = False
     running = True
 
+    ##########
+    # Build and pre-load stimulus
+    ##########
+    # roll text
+    intro = text_font.render("Initializing...", True, white)
+    screen.blit(intro, intro.get_rect(center = (screen_width*0.5, screen_height*0.75)))
+    pygame.display.flip()
+    # stimulus
+    disk_angle = 0.0
+    disk_surface = draw_disks(screen_width, screen_height, rand_seed, disk_count, central_radius_px, disk_diam_px, between_disk_gap)
+    rotated = get_rotations(disk_surface, condition)
+    rod_surface = draw_rod(screen_width, screen_height, center, central_radius_px, rod_len_px)
+    rod_start_angle = rod_start_angles[trial] * 40
+    rod_angle = rod_start_angles[trial] * 40
+    # wipe text
+    wipe(screen, screen_width, screen_height)
+
+    ##########
+    # Main experiment loop
+    ##########
     # main loop
     while running:
+        # response (input) behaviour
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -346,25 +393,28 @@ def main():
                     esc_pressed = True
                     last_esc_time = current_time
                 elif not started:
+                        # enter to start experiment
                         if event.key == pygame.K_RETURN:
-                            disk_angle = 0.0
-                            disk_surface = draw_disks(screen_width, screen_height, seed, disk_count, central_radius_px, disk_diam_px, between_disk_gap)
-                            rod_surface = draw_rod(screen_width, screen_height, center, central_radius_px, rod_len_px)
-                            rod_start_angle = rod_start_angles[trial] * 40
-                            rod_angle = rod_start_angles[trial] * 40
                             started_time = pygame.time.get_ticks()
+                            trial_start_time = pygame.time.get_ticks()
                             started = True
                             in_trial = True
                 else:
+                    # space to advance to next trial only if not ended
                     if event.key == pygame.K_SPACE:
-                        if not in_trial and not ended:
-                            disk_angle = 0.0
-                            disk_surface = draw_disks(screen_width, screen_height, seed, disk_count, central_radius_px, disk_diam_px, between_disk_gap)
-                            rod_surface = draw_rod(screen_width, screen_height, center, central_radius_px, rod_len_px)
-                            rod_start_angle = rod_start_angles[trial] * 40
-                            rod_angle = rod_start_angles[trial] * 40
-                            started_time = pygame.time.get_ticks()
-                            in_trial = True
+                        if in_trial and not ended:
+                            now = datetime.now()
+                            current_time = pygame.time.get_ticks()
+                            duration_ms = current_time - trial_start_time
+                            trial += 1
+                            data.append([now.strftime("%Y-%m-%d"),now.strftime("%H-%M-%S"),started_time,current_time,seed,subject,condition,trial,duration_ms,rod_start_angle,rod_angle,direction_str,disk_rotation_speed_dat])
+                            if trial >= trial_total:
+                                ended = True
+                            else:
+                                # start a new trial
+                                rod_start_angle = rod_start_angles[trial] * rod_init_angle
+                                rod_angle = rod_start_angles[trial] * rod_init_angle
+                                trial_start_time = pygame.time.get_ticks()
             # second half of handling quit, when esc is up (unpressed), esc_pressed is set to false
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_ESCAPE:
@@ -373,37 +423,25 @@ def main():
             if event.type == pygame.MOUSEWHEEL:
                 if in_trial:
                     rod_angle -= event.y * wheel_step_degree
-        
+
+        # display behaviour
         if not started:
             for i in range(len(instructions)):
                 message = text_font.render(instructions[i], True, white)
-                screen.blit(message, message.get_rect(center = (screen_width*0.5, (i+1)*(screen_height*(1/(len(instructions)+1))))))
+                screen.blit(message, message.get_rect(center = (screen_width*0.5, (i+1)*(screen_height*(1/(len(instructions)+3))))))
         elif ended:
             wipe(screen, screen_width, screen_height)
             for i in range(len(debriefs)):
                 message = text_font.render(debriefs[i], True, white)
-                screen.blit(message, message.get_rect(center = (screen_width*0.5, (i+1)*(screen_height*(1/(len(instructions)+1))))))
-        elif in_trial:
+                screen.blit(message, message.get_rect(center = (screen_width*0.5, (i+1)*(screen_height*(1/(len(debriefs)+5))))))
+        else:
             now = pygame.time.get_ticks()
             elapsed = (now - started_time) * 0.001
-            disk_angle = (direction * disk_rotation_speed * elapsed) % 360
-            disk_rotated = pygame.transform.rotate(disk_surface, -disk_angle) # use rotate instead of rotozoom to reduce CPU usage and prevent lagging (but will cause slightly more aliasing/jagged edges)
+            disk_angle = int(((direction * disk_rotation_speed * elapsed) % 360)*2) # x2 to map onto 720 pre-built frames
+            # disk_angle = int((direction * disk_rotation_speed * elapsed) % 360)
             rod_rotated = pygame.transform.rotozoom(rod_surface, -rod_angle, 1.0)
-            # wipe(screen, screen_width, screen_height)
-            screen.blit(disk_rotated, disk_rotated.get_rect(center=center))
+            screen.blit(rotated[disk_angle], rotated[disk_angle].get_rect(center=center))
             screen.blit(rod_rotated, rod_rotated.get_rect(center=center))
-            current_time = pygame.time.get_ticks()
-            if current_time - started_time >= duration_ms:
-                trial += 1
-                now = datetime.now()
-                data.append([now.strftime("%Y-%m-%d"),now.strftime("%H-%M-%S"),started_time,current_time,subject,condition,trial,duration_ms,rod_start_angle,rod_angle,direction_str,disk_rotation_speed])
-                in_trial = False
-                if trial >= trial_total:
-                    ended = True
-        else:
-            wipe(screen, screen_width, screen_height)
-            message = text_font.render("press space for the next trial.", True, white)
-            screen.blit(message, message.get_rect(center = (screen_width*0.5, (i+1)*(screen_height*(1/(len(instructions)+1))))))
         pygame.display.flip()
         clock.tick(120) # cap at 120 fps to allow smoother animation on better PCs
 
