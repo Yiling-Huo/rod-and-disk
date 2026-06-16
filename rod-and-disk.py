@@ -290,7 +290,8 @@ def main():
     ##########
     pygame.init()
     pygame.mixer.init()
-    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, display=0)
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    # screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN, display=1)
     screen_width, screen_height = screen.get_size()
     center = (screen_width // 2, screen_height // 2)
     clock = pygame.time.Clock()
