@@ -57,7 +57,7 @@ This is a pygame application to run the classic rod-and-disk task. In each trial
 *You should keep these consistent within an experiment.*
 - Disk count: number of dots generated on the canvas. *Note: canvas side length equals the screen diagonal, so not all dots are necessarily visible at once.*
 - Rod length (pixels): the length of the rod.
-- Central radius (pixels): the radius of the no-dot central window. *Should be larger than rod length.*
+- Central radius (pixels): the radius of the no-dot central window. *Should be larger than rod length/2.*
 - Disk diameter (pixels): the diameter of each dot.
 - Minimum gap between disks (pixels)
 
