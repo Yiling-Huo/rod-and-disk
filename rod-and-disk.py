@@ -33,7 +33,7 @@ results_dir = 'results/'
 # tkinter functions
 ##########
 
-def ask_params(defaults={"participant_id": "001", "trials": 20, "speed_deg_s": 30.0, "duration": 60, "direction":"clockwise", "seed":1, "disk_count": 440, "rod_len_px": 200, "central_radius_px": 110, "disk_diam_px": 50, "between_disk_gap": 20, "rod_init_angle": 40, "rod_velocity": 0.5}):
+def ask_params(defaults={"participant_id": "001", "trials": 20, "speed_deg_s": 30.0, "duration": 60, "direction":"clockwise", "seed":1, "disk_count": 440, "rod_len_px": 200, "central_radius_px": 110, "disk_diam_px": 50, "between_disk_gap": 20, "rod_init_angle": 40, "rod_velocity": 4.0}):
     root = tk.Tk()
     root.withdraw()  # hide the empty root window
 
